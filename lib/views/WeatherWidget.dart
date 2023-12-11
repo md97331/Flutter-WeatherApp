@@ -18,128 +18,142 @@ class WeatherWidget extends StatelessWidget {
         weather.main?.tempMin != null ? weather.main!.tempMin! - 273.15 : null;
     double? maxTempCelsius =
         weather.main?.tempMax != null ? weather.main!.tempMax! - 273.15 : null;
+    String backgroundImage = _getWeatherBG(weather.weather?.first.main);
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(backgroundImage),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black
+                .withOpacity(0.5), // Adding a filter for better text visibility
+            BlendMode.dstATop,
+          ),
+        ),
+      ),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: <Widget>[
+              // First Row: Weather Information
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                child: Center(
+                  child: Text(
+                    weather.name ?? 'Unknown Location',
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                ),
+              ),
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: <Widget>[
-            // First Row: Weather Information
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
-              child: Center(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: weather.weather?.first.main ?? 'Weather',
+                      value:
+                          weather.weather?.first.description ?? 'Description',
+                      iconData: _getWeatherIcon(weather.weather?.first.main),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8.0),
+
+              // Second Row: Temperature Information
+
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  weather.name ?? 'Unknown Location',
-                  style: Theme.of(context).textTheme.headline4,
+                  'Temperature Info',
+                  style: Theme.of(context).textTheme.headline6,
                 ),
               ),
-            ),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: weather.weather?.first.main ?? 'Weather',
-                    value: weather.weather?.first.description ?? 'Description',
-                    iconData: _getWeatherIcon(weather.weather?.first.main),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: 'Temperature',
+                      value:
+                          '${temperatureCelsius?.toStringAsFixed(1) ?? 'N/A'}°C',
+                      iconData: Icons.thermostat_rounded,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.0),
-
-            // Second Row: Temperature Information
-
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                'Temperature Info',
-                style: Theme.of(context).textTheme.headline6,
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: 'Feels Like',
+                      value:
+                          '${feelsLikeCelsius?.toStringAsFixed(1) ?? 'N/A'}°C',
+                      iconData: Icons.thermostat_outlined,
+                    ),
+                  ),
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: 'Min',
+                      value: '${minTempCelsius?.toStringAsFixed(1) ?? 'N/A'}°C',
+                      iconData: Icons.arrow_downward,
+                    ),
+                  ),
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: 'Max',
+                      value: '${maxTempCelsius?.toStringAsFixed(1) ?? 'N/A'}°C',
+                      iconData: Icons.arrow_upward,
+                    ),
+                  ),
+                ],
               ),
-            ),
+              SizedBox(height: 8.0),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: 'Temperature',
-                    value:
-                        '${temperatureCelsius?.toStringAsFixed(1) ?? 'N/A'}°C',
-                    iconData: Icons.thermostat_rounded,
-                  ),
+              // Third Row: Wind and Cloud Information
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'Wind and Cloud Info',
+                  style: Theme.of(context).textTheme.headline6,
                 ),
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: 'Feels Like',
-                    value:
-                        '${feelsLikeCelsius?.toStringAsFixed(1) ?? 'N/A'}°C',
-                    iconData: Icons.thermostat_outlined,
-                  ),
-                ),
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: 'Min',
-                    value: '${minTempCelsius?.toStringAsFixed(1) ?? 'N/A'}°C',
-                    iconData: Icons.arrow_downward,
-                  ),
-                ),
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: 'Max',
-                    value: '${maxTempCelsius?.toStringAsFixed(1) ?? 'N/A'}°C',
-                    iconData: Icons.arrow_upward,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.0),
-
-            // Third Row: Wind and Cloud Information
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                'Wind and Cloud Info',
-                style: Theme.of(context).textTheme.headline6,
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: 'Wind Speed',
-                    value:
-                        '${weather.wind?.speed?.toStringAsFixed(1) ?? 'N/A'} m/s',
-                    iconData: Icons.air,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: 'Wind Speed',
+                      value:
+                          '${weather.wind?.speed?.toStringAsFixed(1) ?? 'N/A'} m/s',
+                      iconData: Icons.air,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: 'Cloudiness',
-                    value: '${weather.clouds?.all ?? 'N/A'}%',
-                    iconData: Icons.cloud_queue,
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: 'Cloudiness',
+                      value: '${weather.clouds?.all ?? 'N/A'}%',
+                      iconData: Icons.cloud_queue,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: 'Pressure',
-                    value: '${weather.main?.pressure ?? 'N/A'} hPa',
-                    iconData: Icons.compress,
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: 'Pressure',
+                      value: '${weather.main?.pressure ?? 'N/A'} hPa',
+                      iconData: Icons.compress,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: WeatherInfoCard(
-                    title: 'Humidity',
-                    value: '${weather.main?.humidity ?? 'N/A'}%',
-                    iconData: Icons.water_drop,
+                  Expanded(
+                    child: WeatherInfoCard(
+                      title: 'Humidity',
+                      value: '${weather.main?.humidity ?? 'N/A'}%',
+                      iconData: Icons.water_drop,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.0),
-          ],
+                ],
+              ),
+              SizedBox(height: 8.0),
+            ],
+          ),
         ),
       ),
     );
@@ -176,6 +190,34 @@ class WeatherInfoCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String _getWeatherBG(String? condition) {
+  switch (condition) {
+    case 'Thunderstorm':
+      return 'assets/images/thunder.jpg';
+    case 'Drizzle':
+      return 'assets/images/drizz.jpg';
+    case 'Rain':
+      return 'assets/images/rain.jpg';
+    case 'Snow':
+      return 'assets/images/snow.jpg';
+    case 'Mist':
+    case 'Smoke':
+    case 'Haze':
+    case 'Dust':
+    case 'Fog':
+    case 'Sand':
+    case 'Ash':
+    case 'Squall':
+      return 'assets/images/MSHDFSAS.jpg';
+    case 'Clear':
+      return 'assets/images/clear.jpg';
+    case 'Clouds':
+      return 'assets/images/cloud.jpg';
+    default:
+      return 'assets/images/default.jpg';
   }
 }
 
